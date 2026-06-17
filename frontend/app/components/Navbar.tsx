@@ -5,11 +5,13 @@ import { useState } from "react";
 export default function Navbar({
   loggedIn,
   setPage,
-  onLogout
+  onLogout,
+  openAuth
 }: {
   loggedIn: boolean;
   setPage: (page: string) => void;
   onLogout: () => void;
+  openAuth: () => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -18,14 +20,21 @@ export default function Navbar({
     setOpen(false);
   }
 
+  function authClick() {
+    openAuth();
+    setOpen(false);
+  }
+
   return (
     <nav className="navbar">
-      <div className="brand" onClick={() => go("home")}>
-        SMITH CARD
-      </div>
+      <button className="brand" onClick={() => go("home")}>
+        SMITH<span>CARD</span>
+      </button>
 
       <button className="hamburger" onClick={() => setOpen(!open)}>
-        ☰
+        <span></span>
+        <span></span>
+        <span></span>
       </button>
 
       {open && (
@@ -38,7 +47,7 @@ export default function Navbar({
           <button onClick={() => go("social")}>Social Media</button>
 
           {!loggedIn ? (
-            <button className="menuPrimary" onClick={() => go("auth")}>
+            <button className="menuPrimary" onClick={authClick}>
               Sign Up / Login
             </button>
           ) : (
