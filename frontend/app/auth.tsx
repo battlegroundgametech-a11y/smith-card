@@ -19,7 +19,7 @@ export default function AuthBox({
       return;
     }
 
-    const { error } = await supabase.auth.signUp({
+    const { error: signupError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -29,8 +29,20 @@ export default function AuthBox({
       }
     });
 
-    if (error) {
-      alert(error.message);
+    if (signupError) {
+      alert(signupError.message);
+      return;
+    }
+
+    const { error: tableError } = await supabase.from("users").insert([
+      {
+        username: username,
+        email: email
+      }
+    ]);
+
+    if (tableError) {
+      alert("Account created, but profile was not saved: " + tableError.message);
       return;
     }
 
