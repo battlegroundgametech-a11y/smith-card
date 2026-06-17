@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AuthBox from "./auth";
 import Navbar from "./components/Navbar";
 
@@ -8,6 +8,19 @@ export default function Home() {
   const [page, setPage] = useState("home");
   const [loggedIn, setLoggedIn] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  useEffect(() => {
+  async function checkSession() {
+    const { data } = await import("../lib/supabase").then((m) =>
+      m.supabase.auth.getSession()
+    );
+
+    if (data.session) {
+      setLoggedIn(true);
+    }
+  }
+
+  checkSession();
+}, []);
 
   function logout() {
     setLoggedIn(false);
