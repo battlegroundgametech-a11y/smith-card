@@ -1,3 +1,5 @@
+import "./globals.css";
+
 export const metadata = {
   title: "Smith Crypto Card",
   description: "Premium crypto card testing platform on ETH Sepolia"
