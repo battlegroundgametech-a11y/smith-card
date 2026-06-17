@@ -1,8 +1,9 @@
 import "./globals.css";
+import Providers from "./providers";
 
 export const metadata = {
   title: "Smith Crypto Card",
-  description: "Premium crypto card testing platform on ETH Sepolia"
+  description: "Premium crypto card testing platform"
 };
 
 export default function RootLayout({
@@ -12,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
