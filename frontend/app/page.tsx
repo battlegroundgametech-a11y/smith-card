@@ -11,21 +11,21 @@ export default function Home() {
   const [page, setPage] = useState("home");
   const [loggedIn, setLoggedIn] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+
   useEffect(() => {
-  async function checkSession() {
-    const { data } = await import("../lib/supabase").then((m) =>
-      m.supabase.auth.getSession()
-    );
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
 
-    if (data.session) {
-      setLoggedIn(true);
+      if (data.session) {
+        setLoggedIn(true);
+      }
     }
-  }
 
-  checkSession();
-}, []);
+    checkSession();
+  }, []);
 
-  function logout() {
+  async function logout() {
+    await supabase.auth.signOut();
     setLoggedIn(false);
     setPage("home");
   }
@@ -57,11 +57,33 @@ export default function Home() {
       )}
 
       {page === "home" && <HomeSection openAuth={() => setAuthOpen(true)} />}
-      {page === "dashboard" && <Dashboard loggedIn={loggedIn} openAuth={() => setAuthOpen(true)} />}
-      {page === "about" && <InfoPage title="About Smith Card" text="Smith Card is a Sepolia testnet crypto card platform with NFT ownership, demo virtual card access, physical card tracking, Telegram management, reloads, withdrawals, and manual admin approval." />}
-      {page === "support" && <InfoPage title="Help & Support" text="Users will be able to get support through Telegram and email. The Telegram bot will show order status, card status, balance, reload, withdrawal, and shipment updates." />}
-      {page === "faq" && <InfoPage title="FAQ" text="This is a testing version on ETH Sepolia. Real payment card credentials should not be stored in this demo. Demo card details will be used until a compliant card issuer setup exists." />}
-      {page === "social" && <InfoPage title="Social Media" text="Telegram | Twitter/X | Farcaster | Email Support" />}
+      {page === "dashboard" && (
+        <Dashboard loggedIn={loggedIn} openAuth={() => setAuthOpen(true)} />
+      )}
+      {page === "about" && (
+        <InfoPage
+          title="About Smith Card"
+          text="Smith Card is a Sepolia testnet crypto card platform with NFT ownership, demo virtual card access, physical card tracking, Telegram management, reloads, withdrawals, and manual admin approval."
+        />
+      )}
+      {page === "support" && (
+        <InfoPage
+          title="Help & Support"
+          text="Users will be able to get support through Telegram and email. The Telegram bot will show order status, card status, balance, reload, withdrawal, and shipment updates."
+        />
+      )}
+      {page === "faq" && (
+        <InfoPage
+          title="FAQ"
+          text="This is a testing version on ETH Sepolia. Real payment card credentials should not be stored in this demo. Demo card details will be used until a compliant card issuer setup exists."
+        />
+      )}
+      {page === "social" && (
+        <InfoPage
+          title="Social Media"
+          text="Telegram | Twitter/X | Farcaster | Email Support"
+        />
+      )}
     </main>
   );
 }
@@ -79,7 +101,9 @@ function HomeSection({ openAuth }: { openAuth: () => void }) {
           </p>
 
           <div className="heroActions">
-            <button className="mainBtn" onClick={openAuth}>Get Started</button>
+            <button className="mainBtn" onClick={openAuth}>
+              Get Started
+            </button>
             <button className="ghostBtn">Explore Benefits</button>
           </div>
         </div>
@@ -107,9 +131,21 @@ function HomeSection({ openAuth }: { openAuth: () => void }) {
       </section>
 
       <section className="plans">
-        <Plan title="Virtual Card" price="$5" text="Includes NFT and virtual card access. First 1000 buyers receive a $5 bonus." />
-        <Plan title="Physical Card" price="$60" text="Includes NFT, virtual card access, future physical card delivery, $15 bonus, and Track Shipment." />
-        <Plan title="Free Mint" price="Free" text="Includes NFT and inactive demo card. Activate after minimum reload set by admin." />
+        <Plan
+          title="Virtual Card"
+          price="$5"
+          text="Includes NFT and virtual card access. First 1000 buyers receive a $5 bonus."
+        />
+        <Plan
+          title="Physical Card"
+          price="$60"
+          text="Includes NFT, virtual card access, future physical card delivery, $15 bonus, and Track Shipment."
+        />
+        <Plan
+          title="Free Mint"
+          price="Free"
+          text="Includes NFT and inactive demo card. Activate after minimum reload set by admin."
+        />
       </section>
 
       <section className="benefits">
@@ -141,7 +177,25 @@ function Plan({ title, price, text }: any) {
 function Dashboard({ loggedIn, openAuth }: any) {
   const { isConnected, address } = useAccount();
 
+  const [selectedCard, setSelectedCard] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [orderEmail, setOrderEmail] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("");
+
   async function createOrder(cardType: string) {
+    if (!fullName || !orderEmail) {
+      alert("Please enter full name and email.");
+      return;
+    }
+
+    if (cardType === "physical" && (!shippingAddress || !city || !country)) {
+      alert("Please enter shipping address, city, and country.");
+      return;
+    }
+
     const {
       data: { session }
     } = await supabase.auth.getSession();
@@ -176,6 +230,14 @@ function Dashboard({ loggedIn, openAuth }: any) {
         "\nSecret Code: " +
         secretCode
     );
+
+    setSelectedCard("");
+    setFullName("");
+    setOrderEmail("");
+    setCouponCode("");
+    setShippingAddress("");
+    setCity("");
+    setCountry("");
   }
 
   if (!loggedIn) {
@@ -183,7 +245,9 @@ function Dashboard({ loggedIn, openAuth }: any) {
       <section className="centerPage">
         <h1>Login required</h1>
         <p>Please sign up or login before opening the dashboard.</p>
-        <button className="mainBtn" onClick={openAuth}>Sign Up / Login</button>
+        <button className="mainBtn" onClick={openAuth}>
+          Sign Up / Login
+        </button>
       </section>
     );
   }
@@ -208,7 +272,7 @@ function Dashboard({ loggedIn, openAuth }: any) {
             <div className="dashCard">
               <h2>Virtual Card</h2>
               <p>$5 purchase. First 1000 buyers receive a $5 bonus.</p>
-              <button className="mainBtn" onClick={() => createOrder("virtual")}>
+              <button className="mainBtn" onClick={() => setSelectedCard("virtual")}>
                 Purchase Virtual Card
               </button>
             </div>
@@ -216,7 +280,7 @@ function Dashboard({ loggedIn, openAuth }: any) {
             <div className="dashCard">
               <h2>Physical Card</h2>
               <p>$60 purchase. Includes $15 bonus and Track Shipment option.</p>
-              <button className="mainBtn" onClick={() => createOrder("physical")}>
+              <button className="mainBtn" onClick={() => setSelectedCard("physical")}>
                 Purchase Physical Card
               </button>
             </div>
@@ -224,11 +288,67 @@ function Dashboard({ loggedIn, openAuth }: any) {
             <div className="dashCard">
               <h2>Free Mint</h2>
               <p>Free inactive card. Activate after minimum reload.</p>
-              <button className="mainBtn" onClick={() => createOrder("free_mint")}>
+              <button className="mainBtn" onClick={() => setSelectedCard("free_mint")}>
                 Free Mint
               </button>
             </div>
           </div>
+
+          {selectedCard && (
+            <div className="orderForm">
+              <h2>
+                {selectedCard === "virtual" && "Virtual Card Details"}
+                {selectedCard === "physical" && "Physical Card Details"}
+                {selectedCard === "free_mint" && "Free Mint Details"}
+              </h2>
+
+              <input
+                placeholder="Full name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              />
+
+              <input
+                placeholder="Email address"
+                value={orderEmail}
+                onChange={(e) => setOrderEmail(e.target.value)}
+              />
+
+              {selectedCard !== "free_mint" && (
+                <input
+                  placeholder="Coupon code optional"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                />
+              )}
+
+              {selectedCard === "physical" && (
+                <>
+                  <input
+                    placeholder="Shipping address"
+                    value={shippingAddress}
+                    onChange={(e) => setShippingAddress(e.target.value)}
+                  />
+
+                  <input
+                    placeholder="City"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                  />
+
+                  <input
+                    placeholder="Country"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                  />
+                </>
+              )}
+
+              <button className="mainBtn" onClick={() => createOrder(selectedCard)}>
+                Confirm Order
+              </button>
+            </div>
+          )}
         </>
       )}
     </section>
