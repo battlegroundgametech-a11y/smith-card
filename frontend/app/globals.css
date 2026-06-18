@@ -476,3 +476,26 @@ button {
   background: rgba(255,255,255,0.08);
   word-break: break-all;
 }
+
+.orderForm {
+  max-width: 520px;
+  margin: 40px auto 0;
+  padding: 28px;
+  border-radius: 28px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.orderForm input {
+  width: 100%;
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 15px;
+  border: none;
+  font-size: 16px;
+}
+
+.orderForm button {
+  margin-top: 18px;
+  width: 100%;
+}
