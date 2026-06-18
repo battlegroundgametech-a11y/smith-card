@@ -5,6 +5,7 @@ import AuthBox from "./auth";
 import Navbar from "./components/Navbar";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
+import { supabase } from "../lib/supabase";
 
 export default function Home() {
   const [page, setPage] = useState("home");
@@ -140,6 +141,43 @@ function Plan({ title, price, text }: any) {
 function Dashboard({ loggedIn, openAuth }: any) {
   const { isConnected, address } = useAccount();
 
+  async function createOrder(cardType: string) {
+    const {
+      data: { session }
+    } = await supabase.auth.getSession();
+
+    if (!session?.user?.email) {
+      alert("Please login again.");
+      return;
+    }
+
+    const orderId = "SMITH-" + Date.now();
+    const secretCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+    const { error } = await supabase.from("orders").insert([
+      {
+        order_id: orderId,
+        user_email: session.user.email,
+        card_type: cardType,
+        nft_token_id: "Pending",
+        secret_code: secretCode,
+        status: "Pending"
+      }
+    ]);
+
+    if (error) {
+      alert("Order failed: " + error.message);
+      return;
+    }
+
+    alert(
+      "Order created successfully!\n\nOrder ID: " +
+        orderId +
+        "\nSecret Code: " +
+        secretCode
+    );
+  }
+
   if (!loggedIn) {
     return (
       <section className="centerPage">
@@ -170,19 +208,25 @@ function Dashboard({ loggedIn, openAuth }: any) {
             <div className="dashCard">
               <h2>Virtual Card</h2>
               <p>$5 purchase. First 1000 buyers receive a $5 bonus.</p>
-              <button className="mainBtn">Purchase Virtual Card</button>
+              <button className="mainBtn" onClick={() => createOrder("virtual")}>
+                Purchase Virtual Card
+              </button>
             </div>
 
             <div className="dashCard">
               <h2>Physical Card</h2>
               <p>$60 purchase. Includes $15 bonus and Track Shipment option.</p>
-              <button className="mainBtn">Purchase Physical Card</button>
+              <button className="mainBtn" onClick={() => createOrder("physical")}>
+                Purchase Physical Card
+              </button>
             </div>
 
             <div className="dashCard">
               <h2>Free Mint</h2>
               <p>Free inactive card. Activate after minimum reload.</p>
-              <button className="mainBtn">Free Mint</button>
+              <button className="mainBtn" onClick={() => createOrder("free_mint")}>
+                Free Mint
+              </button>
             </div>
           </div>
         </>
