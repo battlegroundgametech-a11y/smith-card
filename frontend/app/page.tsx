@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import AuthBox from "./auth";
 import Navbar from "./components/Navbar";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
 
 export default function Home() {
   const [page, setPage] = useState("home");
@@ -137,6 +138,8 @@ function Plan({ title, price, text }: any) {
 }
 
 function Dashboard({ loggedIn, openAuth }: any) {
+  const { isConnected, address } = useAccount();
+
   if (!loggedIn) {
     return (
       <section className="centerPage">
@@ -150,28 +153,40 @@ function Dashboard({ loggedIn, openAuth }: any) {
   return (
     <section className="centerPage">
       <h1>Dashboard</h1>
-      <p>Connect your Sepolia wallet to continue.</p>
 
-      <div className="walletBox">
-        <ConnectButton />
-      </div>
+      {!isConnected ? (
+        <>
+          <p>Connect your Sepolia wallet to continue.</p>
+          <div className="walletBox">
+            <ConnectButton />
+          </div>
+        </>
+      ) : (
+        <>
+          <p>Wallet connected:</p>
+          <p className="walletAddress">{address}</p>
 
-      <div className="dashboardOptions">
-        <div className="dashCard">
-          <h2>Virtual Card</h2>
-          <p>$5 purchase. First 1000 buyers receive a $5 bonus.</p>
-        </div>
+          <div className="dashboardOptions">
+            <div className="dashCard">
+              <h2>Virtual Card</h2>
+              <p>$5 purchase. First 1000 buyers receive a $5 bonus.</p>
+              <button className="mainBtn">Purchase Virtual Card</button>
+            </div>
 
-        <div className="dashCard">
-          <h2>Physical Card</h2>
-          <p>$60 purchase. Includes $15 bonus and Track Shipment option.</p>
-        </div>
+            <div className="dashCard">
+              <h2>Physical Card</h2>
+              <p>$60 purchase. Includes $15 bonus and Track Shipment option.</p>
+              <button className="mainBtn">Purchase Physical Card</button>
+            </div>
 
-        <div className="dashCard">
-          <h2>Free Mint</h2>
-          <p>Free inactive card. Activate after minimum reload.</p>
-        </div>
-      </div>
+            <div className="dashCard">
+              <h2>Free Mint</h2>
+              <p>Free inactive card. Activate after minimum reload.</p>
+              <button className="mainBtn">Free Mint</button>
+            </div>
+          </div>
+        </>
+      )}
     </section>
   );
 }
