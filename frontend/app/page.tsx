@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import AuthBox from "./auth";
 import Navbar from "./components/Navbar";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export default function Home() {
   const [page, setPage] = useState("home");
@@ -149,7 +150,28 @@ function Dashboard({ loggedIn, openAuth }: any) {
   return (
     <section className="centerPage">
       <h1>Dashboard</h1>
-      <p>Next we will add Connect Wallet, then the three purchase options.</p>
+      <p>Connect your Sepolia wallet to continue.</p>
+
+      <div className="walletBox">
+        <ConnectButton />
+      </div>
+
+      <div className="dashboardOptions">
+        <div className="dashCard">
+          <h2>Virtual Card</h2>
+          <p>$5 purchase. First 1000 buyers receive a $5 bonus.</p>
+        </div>
+
+        <div className="dashCard">
+          <h2>Physical Card</h2>
+          <p>$60 purchase. Includes $15 bonus and Track Shipment option.</p>
+        </div>
+
+        <div className="dashCard">
+          <h2>Free Mint</h2>
+          <p>Free inactive card. Activate after minimum reload.</p>
+        </div>
+      </div>
     </section>
   );
 }
