@@ -466,3 +466,13 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+.walletAddress {
+  max-width: 90%;
+  margin: 10px auto 25px;
+  padding: 12px;
+  border-radius: 14px;
+  color: #67e8f9;
+  background: rgba(255,255,255,0.08);
+  word-break: break-all;
+}
